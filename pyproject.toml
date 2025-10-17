@@ -1,0 +1,21 @@
+# Seção obrigatória para ferramentas de build entenderem seu projeto
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+# Seção principal com os metadados do seu projeto
+[project]
+name = "langchain-course"
+version = "0.1.0"
+description = "Uma breve descrição do que meu projeto faz."
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "langchain>=0.3.27",
+    "langchain-openai>=0.3.30",
+    "python-dotenv>=1.1.1",
+    "black>=25.1.0",
+    "isort>=6.0.1",
+    "langchain-google-genai",
+    "langchain_ollama"
+]
