@@ -11,7 +11,7 @@ description = "Uma breve descrição do que meu projeto faz."
 readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
-    "langchain>=0.3.27",
+    "langchain>=0.3.3",
     "langchain-openai>=0.3.30",
     "python-dotenv>=1.1.1",
     "black>=25.1.0",
