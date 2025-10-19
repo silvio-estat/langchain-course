@@ -17,5 +17,6 @@ dependencies = [
     "black>=25.1.0",
     "isort>=6.0.1",
     "langchain-google-genai",
-    "langchain_ollama"
+    "langchain_ollama",
+    "langchain_tavily"
 ]
