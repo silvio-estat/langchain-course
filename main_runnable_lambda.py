@@ -45,7 +45,14 @@ agent_executor = AgentExecutor(
     agent=agent, tools=tools, verbose=True, handle_parsing_errors=True
 )
 
-chain = agent_executor
+extract_output = RunnableLambda(
+    lambda x: x["output"] #a ideia aqui é extrair o campo 'output' do dicionário retornado pelo agente
+)
+parse_output = RunnableLambda(
+    lambda x: output_parser.parse(x) #aqui temos o parser que converte o output em um objeto do tipo AgentResponse
+)
+
+chain = agent_executor | extract_output | parse_output # a ideia aqui é retirar o output da resposta "final" do agente por meio do extract_output e depois parsear esse output para o formato desejado com o parse_output
 
 
 def main():
@@ -53,7 +60,7 @@ def main():
     try:
         result = chain.invoke(
             input={
-                "input": "Search for 1 job posting for an AI Engineer using langchain in the bay area on linkedin and list their details."
+                "input": "Search for 3 jobs postings for an AI Engineer using langchain in the bay area on linkedin and list their details."
             }
         )
         print(result)
