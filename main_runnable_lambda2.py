@@ -4,15 +4,11 @@ from dotenv import load_dotenv
 from langchain import hub
 from langchain.agents import AgentExecutor
 from langchain.agents.react.agent import create_react_agent
-from langchain_core.output_parsers.pydantic import PydanticOutputParser
 from langchain_core.prompts import PromptTemplate
 from langchain_core.runnables import RunnableLambda
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_tavily import TavilySearch
 
-from langchain_core.runnables import RunnablePassthrough #para ajustr o json apos o string output
-from langchain_core.prompts import ChatPromptTemplate #para ajustr o json apos o string output
-from langchain_core.output_parsers.string import StrOutputParser #para ajustr o json apos o string output
 
 from prompt import REACT_PROMPT_WITH_FORMAT_INSTRUCTIONS
 from schemas import AgentResponse
@@ -22,23 +18,21 @@ load_dotenv()
 tools = [TavilySearch()]
 
 llm = ChatGoogleGenerativeAI(
-    model="gemini-2.5-pro",
+    model="gemini-2.5-flash",
     temperature=0,
     max_tokens=None,
     timeout=None,
     max_retries=2,
 )
 
-#react_prompt = hub.pull("hwchase17/react")
+structured_llm=llm.with_structured_output(AgentResponse)
 
-output_parser = PydanticOutputParser(pydantic_object=AgentResponse)
 
-format_instructions = output_parser.get_format_instructions()
 
 react_prompt_with_instructions = PromptTemplate(
     template=REACT_PROMPT_WITH_FORMAT_INSTRUCTIONS,
     input_variables=["tools", "tool_names", "input", "agent_scratchpad"]
-).partial(format_instructions=format_instructions)
+).partial(format_instructions="")
 
 
 agent = create_react_agent(
@@ -53,13 +47,9 @@ agent_executor = AgentExecutor(
 extract_output = RunnableLambda(
     lambda x: x["output"]#a ideia aqui é extrair o campo 'output' do dicionário retornado pelo agente
 )
-parse_output = RunnableLambda(
-    lambda x: output_parser.parse(x) #aqui temos o parser que converte o output em um objeto do tipo AgentResponse
-)
 
 
-
-chain = agent_executor | extract_output | parse_output # a ideia aqui é retirar o output da resposta "final" do agente por meio do extract_output, transformar para json e depois parsear esse output para o formato desejado com o parse_output
+chain = agent_executor | extract_output | structured_llm
 
 
 def main():
